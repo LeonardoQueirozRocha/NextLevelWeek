@@ -1,6 +1,6 @@
 const Database = require('./db')
 const createProffy = require('./createProffy')
-Database.then((db) => {
+Database.then(async(db) => {
     // Inserir dados
     const proffyValue = {
         name: "Diego Fernandes",
@@ -10,11 +10,11 @@ Database.then((db) => {
     }
 
     classValue = {
-        subject: "Química",
+        subject: 1,
         cost: "20",
     }
 
-    classScheduleValue = [{
+    classScheduleValues = [{
         weekday: 1,
         time_from: 720,
         time_to: 1220
@@ -24,5 +24,28 @@ Database.then((db) => {
         time_to: 1220
     }]
 
-    // createProffy(db, {proffyValue, classValue, classScheduleValue})
+    // await createProffy(db, { proffyValue, classValue, classScheduleValues })
+
+    const selectedProffys = await db.all("SELECT * FROM proffys")
+        // console.log(selectedProffys)
+
+    const selectdClassesAndProffys = await db.all(`
+            SELECT classes.*, proffys.*
+            FROM proffys
+            JOIN
+            classes ON (classes.proffy_id = proffys.id)
+            WHERE classes.proffy_id = 1;
+        `)
+        // console.log(selectdClassesAndProffys)
+
+    const selectClassesSchedules = await db.all(`
+        SELECT class_schedule.* 
+        FROM class_schedule
+        WHERE class_schedule.class_id = "1"
+        AND class_schedule.weekday = "0"
+        AND class_schedule.time_from <= "1300"
+        AND class_schedule.time_to > "1300"
+    `)
+
+    console.log(selectClassesSchedules)
 })
